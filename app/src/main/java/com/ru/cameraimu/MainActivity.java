@@ -1,6 +1,7 @@
 package com.ru.cameraimu;
 
 import android.app.Activity;
+import android.view.View.OnClickListener;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,9 +22,9 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends Activity {
+public class MainActivity extends  Activity implements OnClickListener{
 
-  public static final boolean NEED_RECORD = false;
+  public static final boolean NEED_RECORD = true;
   public static final int DEFAULT_CAPTURE_W = 640;
   public static final int DEFAULT_CAPTURE_H = 480;
 
@@ -51,6 +53,10 @@ public class MainActivity extends Activity {
   // Debug
   private final String TAG = "TAG/CameraIMU";
 
+  private Button mButtonFixExposure;
+  private Button mButtonCaptureData;
+
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     Log.i(TAG, "onCreate");
@@ -77,10 +83,6 @@ public class MainActivity extends Activity {
       return;
     }
 
-    //int cameras = Camera.getNumberOfCameras();
-
-
-
 
     if (!checkCamera()) {
       Toast toast = Toast.makeText(context, R.string.failed_to_access_camere, Toast.LENGTH_SHORT);
@@ -102,6 +104,7 @@ public class MainActivity extends Activity {
       mStorageDir = getResources().getString(R.string.app_name) + File.separator + mDateString;
       File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),
                            mStorageDir + File.separator + "IMG");
+
       if (!file.mkdirs()) {
         Toast toast = Toast.makeText(context, R.string.failed_to_access_external_storage, Toast.LENGTH_SHORT);
         toast.show();
@@ -119,6 +122,15 @@ public class MainActivity extends Activity {
 
     mShutter = new CamCallbacks.ShutterCallback();
     mPicture = new CamCallbacks.PictureCallback(this);
+
+    mButtonFixExposure = (Button) findViewById(R.id.fixExpo_btn);
+    mButtonCaptureData = (Button) findViewById(R.id.capture_btn);
+
+    // bind
+    mButtonFixExposure.setOnClickListener(this);
+    mButtonCaptureData.setOnClickListener(this);
+
+
   }
 
   @Override
@@ -180,9 +192,25 @@ public class MainActivity extends Activity {
     mInfoView.append(String.format(Locale.US, "GZ: %08.6f\t\tAZ: %08.6f\n", gyroData.z(), acceData.z()));
     mInfoView.append(String.format(Locale.US, "Timestamp Nanos: %d", timestampNanos));
   }
-
+  @Override
+  public void onClick(View v) {
+    switch (v.getId()) {
+      case R.id.fixExpo_btn:{
+        Toast.makeText(MainActivity.this, "Fix Exposure", Toast.LENGTH_SHORT).show();
+        onFixExpoBtnClick(v);
+        break;
+      }
+      case R.id.capture_btn:{
+        Toast.makeText(MainActivity.this, "Capture Data", Toast.LENGTH_SHORT).show();
+        onCaptureBtnClick(v);
+        break;
+      }
+      default:
+        break;
+    }
+  }
   public void onCaptureBtnClick(View view) {
-    /*
+
     if (!mIsCapturing) {
       synchronized (mIsCapturing) { mIsCapturing = true; }
       Context context = getApplicationContext();
@@ -200,17 +228,22 @@ public class MainActivity extends Activity {
         mAcceListener.flushData();
       }
     }
-    */
 
+
+
+
+  }
+
+  public void onFixExpoBtnClick(View view) {
     Camera.Parameters params = mCamera.getParameters();
 
-                     if (params.isAutoExposureLockSupported()) {
+    if (params.isAutoExposureLockSupported()) {
 
-                            params.setAutoExposureLock(true);
-                            mCamera.setParameters(params);
-                            String message = (true) ? "Locked" : "Unlocked";
-                            //Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-                        }
+      params.setAutoExposureLock(true);
+      mCamera.setParameters(params);
+      //String message = (true) ? "Locked" : "Unlocked";
+      //Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+    }
 
   }
 
@@ -257,17 +290,6 @@ public class MainActivity extends Activity {
     List<String> whiteBalanceModes = params.getSupportedWhiteBalance();
     if (whiteBalanceModes.contains(Camera.Parameters.WHITE_BALANCE_DAYLIGHT))
       params.setWhiteBalance(Camera.Parameters.WHITE_BALANCE_DAYLIGHT);
-/*
-    if(params.isAutoExposureLockSupported()){
-      params.setAutoExposureLock(false);
-    }
-    */
-
-    int currentExposure = params.getExposureCompensation();
-
-
-    params.setExposureCompensation(currentExposure);
-
 
 
     params.setPreviewSize(DEFAULT_CAPTURE_W, DEFAULT_CAPTURE_H);

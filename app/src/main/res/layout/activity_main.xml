@@ -23,12 +23,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/btn_layout"
         android:background="@android:color/black"
         android:layout_toEndOf="@id/cam_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">>
+
         <Button
             android:id="@+id/capture_btn"
             android:layout_width="@dimen/btn_width"
@@ -36,8 +39,19 @@
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="@dimen/btn_margin_right"
             android:layout_centerVertical="true"
+            android:text="Cap Data"
             android:onClick="onCaptureBtnClick"/>
 
-    </RelativeLayout>
+        <Button
+            android:id="@+id/fixExpo_btn"
+            android:layout_width="@dimen/btn_width"
+            android:layout_height="@dimen/btn_height"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="@dimen/btn_margin_right"
+            android:layout_centerVertical="true"
+            android:text="Fix Expo"
+            android:onClick="onFixExpoBtnClick"/>
+
+    </LinearLayout>
 
 </RelativeLayout>

@@ -153,15 +153,15 @@ public class IMUEventListener implements SensorEventListener {
   private void recordData(float[] v, long timestampNanos) {
     if (mSequence == null)
       mSequence = new LinkedList<DataTupleT>();
-    mSequence.add(new DataTupleT(v, timestampNanos));
+      mSequence.add(new DataTupleT(v, timestampNanos));
 
     // When a single data sequence reached its upper limit
     // instantiate an AsyncTask to execute the writing
     // in order to prevent blocking
-    if (mSequence.size() == SINGLE_SEQUENCE_LIMIT) {
-      LinkedList<DataTupleT> asyncSequence = mSequence;
-      mSequence = new LinkedList<DataTupleT>();
-      new OutputAsyncTask().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, asyncSequence);
-    }
+      if (mSequence.size() == SINGLE_SEQUENCE_LIMIT) {
+        LinkedList<DataTupleT> asyncSequence = mSequence;
+        mSequence = new LinkedList<DataTupleT>();
+        new OutputAsyncTask().executeOnExecutor(AsyncTask.SERIAL_EXECUTOR, asyncSequence);
+      }
   }
 }
